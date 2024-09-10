@@ -35,6 +35,11 @@ export default tseslint.config(
       '@typescript-eslint/no-misused-promises': 'error',
       'object-shorthand': 'error',
       '@typescript-eslint/consistent-type-imports': 'error',
+      '@typescript-eslint/explicit-function-return-type': [
+        'error',
+        { allowExpressions: true },
+      ],
+      '@typescript-eslint/strict-boolean-expressions': 'error',
     },
     languageOptions: {
       parserOptions: {

@@ -23,12 +23,15 @@
     }
   },
   "dependencies": {
+    "@inquirer/prompts": "^5.3.8",
     "@types/text-table": "^0.2.5",
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
+    "listr2": "^8.2.4",
     "minecraft-protocol": "^1.47.0",
     "strip-ansi": "^7.1.0",
     "text-table": "^0.2.0",
+    "tmp-promise": "^3.0.3",
     "zod": "^3.23.8"
   },
   "devDependencies": {

@@ -1,3 +1,5 @@
+import './override.js';
+
 import { Command } from 'commander';
 import { basename, resolve } from 'path';
 
