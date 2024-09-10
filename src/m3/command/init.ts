@@ -1,6 +1,6 @@
 import { confirm, input } from '@inquirer/prompts';
 import { Argument } from 'commander';
-import { mkdir, writeFile } from 'fs/promises';
+import { mkdir, readFile, writeFile } from 'fs/promises';
 import type { ListrTask } from 'listr2';
 import { Listr } from 'listr2';
 import { resolve } from 'path';
@@ -9,23 +9,61 @@ import type { Writable } from 'stream';
 import { exists } from '../../util/file.js';
 import { run } from '../process.js';
 import program, { moduleDir, modulesDir } from '../program.js';
-import type { GlobalModuleData, LocalModuleData } from '../types.js';
+import {
+  type GlobalModuleData,
+  type LocalModuleData,
+  type PackageJson,
+  PackageJsonSchema,
+} from '../types.js';
 
 program
   .command('init')
   .description('Initialize a new module')
   .addArgument(new Argument('[name]', 'Name of the module').default(moduleDir))
+  .option('--author <author>', 'Author of the module')
+  .option('--license <license>', 'License of the module')
+  .option('--description <description>', 'Description of the module')
   .option('-f, --override', 'Overwrite existing module')
-  .option('--git', 'Initialize a new git repository')
-  .option('--npm', 'Initialize a new npm package')
+  .option('--git', 'Create a git repository')
+  .option('--npm', 'Create a package.json file')
   .action(
     async (
       name: string | undefined,
-      options: { git?: boolean; npm?: boolean; override?: boolean },
+      options: {
+        override?: boolean;
+
+        author?: string;
+        license?: string;
+        description?: string;
+
+        git?: boolean;
+        npm?: boolean;
+      },
     ) => {
+      const override = options.override ?? false;
+
       name =
         name ??
         (await input({ message: 'Name of the module', default: moduleDir }));
+      const author =
+        options.author ??
+        (await input({
+          message: 'Author',
+          default: 'Anonymous',
+        }));
+      const license =
+        options.license ??
+        (await input({
+          message: 'License',
+          default: 'MIT',
+        }));
+      const description =
+        options.description ??
+        (await input({
+          message: 'Description',
+          default: '',
+        }));
+
       const git =
         options.git ??
         (await confirm({
@@ -40,9 +78,12 @@ program
         }));
 
       await init({
-        override: options.override ?? false,
+        override,
 
         name,
+        author,
+        license,
+        description,
 
         git,
         npm,
@@ -55,6 +96,9 @@ interface InitOptions {
   override: boolean;
 
   name: string;
+  author: string;
+  license: string;
+  description: string;
 
   git: boolean;
   npm: boolean;
@@ -78,7 +122,7 @@ async function init(options: InitOptions): Promise<void> {
       task: async (_ctx, task) => {
         await run(
           'git',
-          ['init'],
+          ['init', '--initial-branch=main'],
           { cwd: directory },
           { stdout: task.stdout() as Writable },
         );
@@ -96,6 +140,29 @@ async function init(options: InitOptions): Promise<void> {
           { cwd: directory },
           { stdout: task.stdout() as Writable },
         );
+
+        task.output = 'reading file...';
+        const before = await readFile(
+          resolve(directory, 'package.json'),
+          'utf8',
+        );
+
+        task.output = 'parsing json...';
+        const unsafe: PackageJson = JSON.parse(before);
+
+        task.output = 'validating schema...';
+        const safe = PackageJsonSchema.parse(unsafe);
+
+        safe.name = options.name;
+        safe.author = options.author;
+        safe.license = options.license;
+        safe.description = options.description;
+
+        task.output = 'serializing json...';
+        const after = JSON.stringify(safe, undefined, 2);
+
+        task.output = 'writing file...';
+        await writeFile(resolve(directory, 'package.json'), after);
       },
     });
   }
@@ -115,12 +182,12 @@ async function init(options: InitOptions): Promise<void> {
 
         await writeFile(
           resolve(directory, 'm3.global.json'),
-          JSON.stringify(global),
+          JSON.stringify(global, undefined, 2),
         );
 
         await writeFile(
           resolve(directory, 'm3.local.json'),
-          JSON.stringify(local),
+          JSON.stringify(local, undefined, 2),
         );
       },
     });

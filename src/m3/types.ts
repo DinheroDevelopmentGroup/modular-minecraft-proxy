@@ -23,3 +23,14 @@ export const GlobalModuleDataSchema = z.object({
 });
 
 export type GlobalModuleData = z.infer<typeof GlobalModuleDataSchema>;
+
+export const PackageJsonSchema = z
+  .object({
+    name: z.string(),
+    author: z.string(),
+    license: z.string(),
+    description: z.string(),
+  })
+  .passthrough();
+
+export type PackageJson = z.infer<typeof PackageJsonSchema>;
