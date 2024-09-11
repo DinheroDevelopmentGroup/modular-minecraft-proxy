@@ -1,6 +1,6 @@
 <!--
-  I probably won't actually make this into its own repo
-  don't think that because there is a README.md file,
+  I probably won't actually make this into its own repo.
+  Don't think that because there is a README.md file,
   it's its own git repo.
 -->
 

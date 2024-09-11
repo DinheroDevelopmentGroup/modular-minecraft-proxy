@@ -1,6 +1,6 @@
 import { confirm, input } from '@inquirer/prompts';
 import { Argument } from 'commander';
-import { mkdir, readFile, writeFile } from 'fs/promises';
+import { cp, mkdir, readFile, writeFile } from 'fs/promises';
 import type { ListrTask } from 'listr2';
 import { Listr } from 'listr2';
 import { resolve } from 'path';
@@ -19,13 +19,21 @@ import {
 program
   .command('init')
   .description('Initialize a new module')
+
+  .option('-f, --override', 'Overwrite existing module')
+
   .addArgument(new Argument('[name]', 'Name of the module').default(moduleDir))
   .option('--author <author>', 'Author of the module')
   .option('--license <license>', 'License of the module')
   .option('--description <description>', 'Description of the module')
-  .option('-f, --override', 'Overwrite existing module')
+
   .option('--git', 'Create a git repository')
   .option('--npm', 'Create a package.json file')
+
+  .option('--gitattributes', 'Create a .gitattributes file')
+  .option('--gitignore', 'Create a .gitignore file')
+  .option('--readme', 'Create a README.md file')
+
   .action(
     async (
       name: string | undefined,
@@ -38,6 +46,10 @@ program
 
         git?: boolean;
         npm?: boolean;
+
+        gitattributes?: boolean;
+        gitignore?: boolean;
+        readme?: boolean;
       },
     ) => {
       const override = options.override ?? false;
@@ -77,6 +89,25 @@ program
           default: true,
         }));
 
+      const gitattributes =
+        options.gitattributes ??
+        (await confirm({
+          message: 'Create a .gitattributes file?',
+          default: true,
+        }));
+      const gitignore =
+        options.gitignore ??
+        (await confirm({
+          message: 'Create a .gitignore file?',
+          default: true,
+        }));
+      const readme =
+        options.readme ??
+        (await confirm({
+          message: 'Create a README.md file?',
+          default: true,
+        }));
+
       await init({
         override,
 
@@ -88,6 +119,10 @@ program
         git,
         npm,
         m3: true,
+
+        gitattributes,
+        gitignore,
+        readme,
       });
     },
   );
@@ -103,6 +138,10 @@ interface InitOptions {
   git: boolean;
   npm: boolean;
   m3: boolean;
+
+  gitattributes: boolean;
+  gitignore: boolean;
+  readme: boolean;
 }
 
 async function init(options: InitOptions): Promise<void> {
@@ -120,11 +159,13 @@ async function init(options: InitOptions): Promise<void> {
     tasks.push({
       title: 'Initialize git',
       task: async (_ctx, task) => {
+        const stdout = task.stdout() as Writable;
+
         await run(
           'git',
           ['init', '--initial-branch=main'],
           { cwd: directory },
-          { stdout: task.stdout() as Writable },
+          { stdout, stderr: stdout },
         );
       },
     });
@@ -134,11 +175,13 @@ async function init(options: InitOptions): Promise<void> {
     tasks.push({
       title: 'Initialize npm',
       task: async (_ctx, task) => {
+        const stdout = task.stdout() as Writable;
+
         await run(
           'npm',
           ['init', '-y'],
           { cwd: directory },
-          { stdout: task.stdout() as Writable },
+          { stdout, stderr: stdout },
         );
 
         task.output = 'reading file...';
@@ -193,8 +236,65 @@ async function init(options: InitOptions): Promise<void> {
     });
   }
 
+  // <repo>/src/modules/ <--
+  const mmpDir = resolve(modulesDir, '../..');
+
+  if (options.gitattributes) {
+    tasks.push({
+      title: 'Create .gitattributes',
+      task: async () => {
+        await cp(
+          resolve(mmpDir, '.gitattributes'),
+          resolve(directory, '.gitattributes'),
+        );
+      },
+    });
+  }
+
+  if (options.gitignore) {
+    tasks.push({
+      title: 'Create .gitignore',
+      task: async (_ctx, task) => {
+        task.output = 'Fetching .gitignore... (awaiting response)';
+        const response = await fetch(
+          'https://raw.githubusercontent.com/github/gitignore/master/Node.gitignore',
+        );
+
+        task.output = 'Fetching .gitignore... (awaiting text)';
+        let gitignore = await response.text();
+
+        // I personally do not like how Prettier un-inlined
+        // this but don't know an easy way to change it
+        gitignore += ['', '# M3', 'm3.local.json', ''].join('\n');
+
+        task.output = 'Writing file...';
+        await writeFile(resolve(directory, '.gitignore'), gitignore);
+      },
+    });
+  }
+
+  if (options.readme) {
+    tasks.push({
+      title: 'Create README.md',
+      task: async () => {
+        const readmeName = options.name.split('.').pop()!;
+
+        const readme = [
+          `# ${readmeName}`,
+          '',
+          'This is an [MMP](https://github.com/DinheroDevelopmentGroup/modular-minecraft-proxy) module.',
+          'Generated using [M3](https://github.com/DinheroDevelopmentGroup/modular-minecraft-proxy/tree/main/src/m3) init.',
+          '',
+        ].join('\n');
+
+        await writeFile(resolve(directory, 'README.md'), readme);
+      },
+    });
+  }
+
   await new Listr(tasks, {
     concurrent: true,
     exitOnError: false,
+    collectErrors: 'minimal',
   }).run();
 }
