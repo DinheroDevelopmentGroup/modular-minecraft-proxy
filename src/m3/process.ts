@@ -27,7 +27,7 @@ export async function run(
       if (code === 0) {
         resolve();
       } else {
-        reject();
+        reject(new Error(`Process exited with code ${code}`));
       }
     });
   });

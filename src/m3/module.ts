@@ -4,7 +4,7 @@ import { resolve } from 'path';
 import type { GlobalModuleData, LocalModuleData } from './types.js';
 import { GlobalModuleDataSchema, LocalModuleDataSchema } from './types.js';
 
-async function getLocalData(path: string): Promise<LocalModuleData> {
+export async function getLocalData(path: string): Promise<LocalModuleData> {
   try {
     const raw = await readFile(path, 'utf8');
     const data = JSON.parse(raw) as unknown;
@@ -15,7 +15,7 @@ async function getLocalData(path: string): Promise<LocalModuleData> {
   }
 }
 
-async function getGlobalData(path: string): Promise<GlobalModuleData> {
+export async function getGlobalData(path: string): Promise<GlobalModuleData> {
   try {
     const raw = await readFile(path, 'utf8');
     const data = JSON.parse(raw) as unknown;

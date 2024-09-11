@@ -15,7 +15,7 @@ export let modulesDir: string;
 
 // If cwd is a module,
 // cwd will be {modulesDir}/{moduleDir}
-export let moduleDir: string | undefined;
+export let moduleName: string | undefined;
 
 const cwd = process.cwd();
 const cwdn = basename(cwd);
@@ -26,7 +26,7 @@ const parent = resolve('..');
 // (parent is modules dir)
 if (basename(parent) === 'modules') {
   modulesDir = parent;
-  moduleDir = cwdn;
+  moduleName = cwdn;
 } else {
   switch (cwdn) {
     case 'modular-minecraft-proxy':

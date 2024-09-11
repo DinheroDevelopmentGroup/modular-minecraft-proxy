@@ -8,7 +8,7 @@ import type { Writable } from 'stream';
 
 import { exists } from '../../util/file.js';
 import { run } from '../process.js';
-import program, { moduleDir, modulesDir } from '../program.js';
+import program, { moduleName, modulesDir } from '../program.js';
 import {
   type GlobalModuleData,
   type LocalModuleData,
@@ -22,7 +22,7 @@ program
 
   .option('-f, --override', 'Overwrite existing module')
 
-  .addArgument(new Argument('[name]', 'Name of the module').default(moduleDir))
+  .addArgument(new Argument('[name]', 'Name of the module').default(moduleName))
   .option('--author <author>', 'Author of the module')
   .option('--license <license>', 'License of the module')
   .option('--description <description>', 'Description of the module')
@@ -56,7 +56,7 @@ program
 
       name =
         name ??
-        (await input({ message: 'Name of the module', default: moduleDir }));
+        (await input({ message: 'Name of the module', default: moduleName }));
       const author =
         options.author ??
         (await input({
