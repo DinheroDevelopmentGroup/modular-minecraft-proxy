@@ -24,8 +24,6 @@ export async function* importModulesGenerator(
   index: string,
   callbacks?: Callbacks,
 ): AsyncGenerator<unknown> {
-  console.log('importModulesGenerator', { directory, index });
-
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     const path = resolve(entry.path, entry.name, index);
 

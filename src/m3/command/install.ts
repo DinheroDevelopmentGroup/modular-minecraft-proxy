@@ -46,7 +46,7 @@ program
       await writeFile(globalPath, JSON.stringify(global, null, 2));
     }
 
-    console.log('Calculating delta...');
+    console.info('Calculating delta...');
 
     const addedUrls = new Set<string>();
 
@@ -59,11 +59,11 @@ program
     await addModule(url, true);
 
     if (modules.size === 0) {
-      console.log('Nothing to do.');
+      console.info('Nothing to do.');
       return;
     }
 
-    console.log(`Adding ${modules.size} module(s)...`);
+    console.info(`Adding ${modules.size} module(s)...`);
 
     if (!options.yes) {
       if (!(await confirm({ message: 'Continue?' }))) return;
@@ -192,7 +192,7 @@ program
           }
 
           modules.set(url, { manual });
-          console.log(chalk.green(`[+] ${global.name}`));
+          console.info(chalk.green(`[+] ${global.name}`));
 
           const promises: Promise<void>[] = [];
 
