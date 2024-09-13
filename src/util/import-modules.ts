@@ -25,12 +25,9 @@ export async function* importModulesGenerator(
   callbacks?: Callbacks,
 ): AsyncGenerator<unknown> {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
-    const path = resolve(entry.path, entry.name, index);
+    const path = resolve(entry.parentPath, entry.name, index);
 
-    if (!entry.isDirectory())
-      console.warn(
-        `Expected ${entry.name} to be a directory (located at ${entry.path})`,
-      );
+    if (!entry.isDirectory()) continue;
 
     if (!(await exists(path))) continue;
 
