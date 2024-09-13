@@ -1,3 +1,5 @@
+import type { States } from 'minecraft-protocol';
+
 import type { EventMap } from '../../util/events.js';
 import { PublicEventHandler } from '../../util/events.js';
 import { Packet, type RawPacket } from '../../util/packet.js';
@@ -36,6 +38,14 @@ class ConnectionSide<
 export const proxy = {
   upstream: new ConnectionSide<PacketEventMap>('upstream'),
   downstream: new ConnectionSide<PacketEventMap>('downstream'),
+  writeDownstream(name: string, data: unknown, state?: States): void {
+    const packet = new Packet(name, data, state);
+    proxy.downstream.write(packet);
+  },
+  writeUpstream(name: string, data: unknown, state?: States): void {
+    const packet = new Packet(name, data, state);
+    proxy.upstream.write(packet);
+  },
 } as const;
 
 channel.subscribe(({ direction, packet: raw }: Message) => {
