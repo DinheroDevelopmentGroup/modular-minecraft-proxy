@@ -196,6 +196,8 @@ async function init(options: InitOptions): Promise<void> {
         task.output = 'validating schema...';
         const safe = PackageJsonSchema.parse(unsafe);
 
+        delete safe.index;
+        safe.type = 'module';
         safe.name = options.name;
         safe.author = options.author;
         safe.license = options.license;

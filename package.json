@@ -7,6 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "scripty",
     "watch:build": "scripty",
+    "copy": "scripty",
+    "watch:copy": "scripty",
     "lint": "scripty",
     "run": "scripty",
     "watch:run": "scripty",
