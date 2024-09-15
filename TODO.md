@@ -3,4 +3,4 @@
 - [x] Server
 - [x] Packet Forwarding
 - [x] Module Loading
-- [ ] Module Manager
+- [x] Module Manager
