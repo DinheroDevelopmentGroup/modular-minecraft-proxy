@@ -21,4 +21,5 @@ export const SERVER_OPTIONS: ServerOptions = {
   host: '127.0.0.1',
   port: 25565,
   version: VERSION,
+  motd: `${TARGET_HOST}:${TARGET_PORT}`,
 };
