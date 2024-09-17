@@ -6,6 +6,6 @@
 # later
 rsync \
   --verbose \
-  -a --del src/ dist \
+  -a src/ dist \
   --exclude "*.ts" \
   $@
