@@ -1,8 +1,10 @@
+  <img src="logo.png" align="right" width="20%"/>
+
 # MMP
 
 - Modular Minecraft Proxy
 
-# How does this differ from other proxies (such as SMP)?
+# How does this differ from other proxies? (such as SMP)
 
 ## Type Safety
 
