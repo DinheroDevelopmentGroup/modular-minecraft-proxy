@@ -15,7 +15,7 @@ override(
       const result = original.call(this, option);
 
       if (
-        option.long &&
+        option.long !== undefined &&
         !option.required &&
         !option.negate &&
         !option.optional

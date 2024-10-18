@@ -49,6 +49,8 @@ class TableGenerator {
 const generator = new TableGenerator();
 generator.stringLength = (string) => stripAnsi(string).length;
 
-export function createTable(data: Record<string, string>[] | string[][]) {
+export function createTable(
+  data: Record<string, string>[] | string[][],
+): string {
   return generator.generate(data);
 }
