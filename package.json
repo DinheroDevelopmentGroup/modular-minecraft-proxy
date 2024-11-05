@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "@inquirer/prompts": "^5.3.8",
-    "@types/text-table": "^0.2.5",
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
     "listr2": "^8.2.4",
@@ -42,6 +41,7 @@
     "@swc/core": "^1.7.22",
     "@swc/helpers": "^0.5.12",
     "@types/node": "^22.5.1",
+    "@types/text-table": "^0.2.5",
     "eslint": "^9.9.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-simple-import-sort": "^12.1.1",
