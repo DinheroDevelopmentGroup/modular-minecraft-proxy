@@ -1,0 +1,8 @@
+{
+  "search.exclude": {
+    "src/modules": false,
+    "src/modules/*": false,
+    "src/modules/**": false,
+    "src/modules/**/*": false
+  }
+}
