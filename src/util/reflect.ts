@@ -8,11 +8,5 @@ export function override<T, K extends keyof T>(
     ? (this: T, ...args: TArgs) => TReturnType
     : T[K],
 ): void {
-  let original = target[key];
-
-  if (typeof original === 'function') {
-    original = original.bind(target);
-  }
-
-  target[key] = callback(original) as T[K];
+  target[key] = callback(target[key]) as T[K];
 }
